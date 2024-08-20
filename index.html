@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Calendar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+            margin: 20px 0;
+        }
+        #targetDate {
+            padding: 10px;
+            margin-top: 10px;
+            width: 80%;
+            max-width: 300px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .calendar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px auto;
+            max-width: 300px;
+        }
+        .day {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            position: relative;
+        }
+        .day.struck-out::after {
+            content: "X";
+            color: red;
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Countdown to Your End Date</h1>
+    <label for="targetDate">Select your upcoming date:</label>
+    <input type="date" id="targetDate">
+
+    <div id="calendar" class="calendar"></div>
+    <div id="message"></div>
+
+    <script>
+        const calendar = document.getElementById('calendar');
+        const targetDateInput = document.getElementById('targetDate');
+        const message = document.getElementById('message');
+        
+        targetDateInput.addEventListener('change', generateCalendar);
+
+        function generateCalendar() {
+            calendar.innerHTML = ''; // Clear the calendar
+            message.textContent = ''; // Clear the message
+
+            const targetDate = new Date(targetDateInput.value);
+            const today = new Date();
+            const daysDifference = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
+
+            if (daysDifference <= 0) {
+                message.textContent = 'Please select a future date.';
+                return;
+            }
+
+            for (let i = 0; i <= daysDifference; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                const currentDate = new Date(today);
+                currentDate.setDate(today.getDate() + i);
+                dayDiv.textContent = currentDate.getDate();
+
+                dayDiv.addEventListener('click', () => {
+                    if (!dayDiv.classList.contains('struck-out')) {
+                        dayDiv.classList.add('struck-out');
+                        const remainingDays = daysDifference - i;
+                        if (remainingDays > 0) {
+                            message.textContent = `Only ${remainingDays} day(s) left!`;
+                        } else {
+                            message.textContent = 'Hurrah, you achieved!';
+                        }
+                    }
+                });
+
+                calendar.appendChild(dayDiv);
+            }
+        }
+    </script>
+</body>
+</html>
