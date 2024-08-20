@@ -16,14 +16,21 @@
             color: #333;
             margin: 20px 0;
         }
+        #targetDateContainer {
+            display: block;
+            margin-top: 10px;
+        }
         #targetDate {
             padding: 10px;
-            margin-top: 10px;
             width: 80%;
             max-width: 300px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
+        #targetDate:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
         }
         .calendar {
             display: flex;
@@ -64,25 +71,32 @@
 </head>
 <body>
 
-    <h1>Countdown to Your End Date</h1>
-    <label for="targetDate">Select your upcoming date:</label>
-    <input type="date" id="targetDate">
-
+    <h1>Countdown to Your Vacation</h1>
+    <div id="targetDateContainer">
+        <label for="targetDate">Select your upcoming date:</label>
+        <input type="date" id="targetDate" onchange="generateCalendar()" />
+    </div>
+    
     <div id="calendar" class="calendar"></div>
     <div id="message"></div>
 
     <script>
-        const calendar = document.getElementById('calendar');
-        const targetDateInput = document.getElementById('targetDate');
-        const message = document.getElementById('message');
-        
-        targetDateInput.addEventListener('change', generateCalendar);
+        let dateSelected = false;
 
         function generateCalendar() {
-            calendar.innerHTML = ''; // Clear the calendar
-            message.textContent = ''; // Clear the message
+            const targetDateInput = document.getElementById('targetDate');
+            const calendar = document.getElementById('calendar');
+            const message = document.getElementById('message');
+            const targetDateContainer = document.getElementById('targetDateContainer');
+
+            if (dateSelected) return; // Prevent re-selection
 
             const targetDate = new Date(targetDateInput.value);
+            if (!targetDateInput.value) {
+                message.textContent = 'Please select a future date.';
+                return;
+            }
+
             const today = new Date();
             const daysDifference = Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24));
 
@@ -90,6 +104,14 @@
                 message.textContent = 'Please select a future date.';
                 return;
             }
+
+            // Lock the date input and hide the date selection container
+            targetDateInput.disabled = true;
+            targetDateContainer.style.display = 'none';
+            dateSelected = true;
+
+            calendar.innerHTML = ''; // Clear the calendar
+            message.textContent = ''; // Clear the message
 
             for (let i = 0; i <= daysDifference; i++) {
                 const dayDiv = document.createElement('div');
